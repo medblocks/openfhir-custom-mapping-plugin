@@ -5,6 +5,8 @@ import com.google.gson.JsonPrimitive;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Ratio;
 import org.hl7.fhir.r4.model.Timing.UnitsOfTime;
+import org.hl7.fhir.r4.model.Timing;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -274,7 +276,7 @@ public class MappingUtils {
      * @param repeat The FHIR Timing repeat component
      * @return The appropriate OpenEHR frequency unit or null if no valid unit
      */
-    public static String getFrequencyUnit(org.hl7.fhir.r4.model.Timing.TimingRepeatComponent repeat) {
+    public static String getFrequencyUnit(Timing.TimingRepeatComponent repeat) {
         if (!repeat.hasPeriodUnit()) {
             return null;
         }

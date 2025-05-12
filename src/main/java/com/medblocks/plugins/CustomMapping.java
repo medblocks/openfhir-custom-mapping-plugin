@@ -9,6 +9,10 @@ import com.google.gson.JsonObject;
 import com.medblocks.openfhir.plugin.api.FormatConverter;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Timing;
+import org.hl7.fhir.r4.model.Dosage;
+import org.hl7.fhir.r4.model.Range;
+import org.hl7.fhir.r4.model.Quantity;
+
 import java.util.function.Supplier;
 
 import com.medblocks.plugins.unit.TimeUnitConverterFactory;
@@ -307,9 +311,9 @@ public class CustomMapping extends Plugin {
                 boolean isRateRatio = false;
                 
                 // Check if the value is Dosage.DosageDoseAndRateComponent
-                if (fhirValue instanceof org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent) {
-                    org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent doseAndRate = 
-                        (org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent) fhirValue;
+                if (fhirValue instanceof Dosage.DosageDoseAndRateComponent) {
+                    Dosage.DosageDoseAndRateComponent doseAndRate = 
+                        (Dosage.DosageDoseAndRateComponent) fhirValue;
                     
                     // Check if it has rateRatio
                     if (doseAndRate.hasRateRatio()) {
@@ -421,8 +425,8 @@ public class CustomMapping extends Plugin {
                 
                 // The fhirValue should directly be the dose, which is either a Range or Quantity
                 // Check if the dose is a Range
-                if (fhirValue instanceof org.hl7.fhir.r4.model.Range) {
-                    org.hl7.fhir.r4.model.Range doseRange = (org.hl7.fhir.r4.model.Range) fhirValue;
+                if (fhirValue instanceof Range) {
+                    Range doseRange = (Range) fhirValue;
                     
                     // Check if we have a valid low value
                     if (doseRange.hasLow() && doseRange.getLow().hasValue()) {
@@ -458,8 +462,8 @@ public class CustomMapping extends Plugin {
                     return true;
                 }
                 // Check if the dose is a Quantity
-                else if (fhirValue instanceof org.hl7.fhir.r4.model.Quantity) {
-                    org.hl7.fhir.r4.model.Quantity doseQuantity = (org.hl7.fhir.r4.model.Quantity) fhirValue;
+                else if (fhirValue instanceof Quantity) {
+                    Quantity doseQuantity = (Quantity) fhirValue;
                     
                     // Check if we have a valid value
                     if (doseQuantity.hasValue()) {
