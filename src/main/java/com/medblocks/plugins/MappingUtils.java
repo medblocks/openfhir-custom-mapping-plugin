@@ -4,12 +4,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Ratio;
+import org.hl7.fhir.r4.model.Timing.UnitsOfTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.medblocks.plugins.unit.TimeUnitConverterFactory;
 
 /**
  * Utility class containing helper methods for FHIR to OpenEHR mapping operations
@@ -276,21 +279,8 @@ public class MappingUtils {
             return null;
         }
         
-        org.hl7.fhir.r4.model.Timing.UnitsOfTime periodUnit = repeat.getPeriodUnit();
-        
-        // Map FHIR period units to OpenEHR frequency units based on constraints
-        switch (periodUnit) {
-            case S:
-                return "1/s";
-            case MIN:
-                return "1/min";
-            case H:
-                return "1/h";
-            case D:
-                return "1/d";
-            default:
-                return null; // No valid mapping for other units
-        }
+        UnitsOfTime periodUnit = repeat.getPeriodUnit();
+        return TimeUnitConverterFactory.getFrequencyConverter().convertUnit(periodUnit);
     }
     
     /**
@@ -300,30 +290,8 @@ public class MappingUtils {
      * @param periodUnit The time unit
      * @return ISO 8601 duration string or null if invalid unit
      */
-    public static String periodToDuration(double period, org.hl7.fhir.r4.model.Timing.UnitsOfTime periodUnit) {
-        if (periodUnit == null) {
-            return null;
-        }
-        
-        // Create ISO 8601 duration string based on unit
-        switch (periodUnit) {
-            case S:
-                return String.format("PT%.0fS", period);
-            case MIN:
-                return String.format("PT%.0fM", period);
-            case H:
-                return String.format("PT%.0fH", period);
-            case D:
-                return String.format("P%.0fD", period);
-            case WK:
-                return String.format("P%.0fW", period);
-            case MO:
-                return String.format("P%.0fM", period);
-            case A:
-                return String.format("P%.0fY", period);
-            default:
-                return null;
-        }
+    public static String periodToDuration(double period, UnitsOfTime periodUnit) {
+        return TimeUnitConverterFactory.getDurationConverter().formatDuration(period, periodUnit);
     }
     
     /**
@@ -332,14 +300,11 @@ public class MappingUtils {
      * @param periodUnit The FHIR time unit
      * @return true if valid, false otherwise
      */
-    public static boolean isValidIntervalUnit(org.hl7.fhir.r4.model.Timing.UnitsOfTime periodUnit) {
-        if (periodUnit == null) {
-            return false;
-        }
-        
-        // All standard time units are valid for ISO 8601 duration
-        return true;
+    public static boolean isValidIntervalUnit(UnitsOfTime periodUnit) {
+        return TimeUnitConverterFactory.getDurationConverter().isValidUnit(periodUnit);
     }
+
+    
 } 
 
 
